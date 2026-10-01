@@ -1,0 +1,82 @@
+from dotenv import load_dotenv
+
+from livekit import agents
+from langchain_core.messages import ToolMessage
+from livekit.agents import Agent, AgentServer, AgentSession, TurnHandlingOptions, inference
+from livekit.plugins import langchain as lk_langchain
+
+from config import settings
+from langchain_agent import campusmitra_agent
+
+_ = load_dotenv()
+
+
+def _is_tool_token(item: object) -> bool:
+    """True for the (ToolMessage, metadata) pairs astream emits from the tools node."""
+    return isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], ToolMessage)
+
+
+class SpeechOnlyGraph:
+    """Wraps the graph so tool return values never reach TTS."""
+
+    def __init__(self, graph: object) -> None:
+        self._graph = graph
+
+    def astream(self, *args: object, **kwargs: object):
+        inner = self._graph.astream(*args, **kwargs)
+
+        async def _filtered():
+            async for item in inner:
+                if not _is_tool_token(item):
+                    yield item
+
+        return _filtered()
+
+
+class CampusMitraAgent(Agent):
+    """CampusMitra voice agent for MVGR College of Engineering backed by LangChain agent graph."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            instructions=(
+                "You are CampusMitra, an AI-powered voice assistant for MVGR College of Engineering. "
+                "Help students, parents, and visitors with admissions, courses, fees, academics, "
+                "examinations, hostels, transport, and placements using official college knowledge."
+            ),
+            llm=lk_langchain.LLMAdapter(graph=SpeechOnlyGraph(campusmitra_agent)),
+        )
+
+
+# Backward compatibility alias
+LaukiAgent = CampusMitraAgent
+
+server = AgentServer()
+
+
+@server.rtc_session()
+async def entrypoint(ctx: agents.JobContext):
+    session = AgentSession(
+        stt=inference.STT(model=settings.stt_model, language=settings.stt_language),
+        tts=inference.TTS(
+            model=settings.tts_model,
+            voice=settings.tts_voice,
+        ),
+        turn_handling=TurnHandlingOptions(
+            turn_detection=inference.TurnDetector(),
+            endpointing={
+                "mode": "fixed",
+                "min_delay": 0.5,
+                "max_delay": 6.0,
+            },
+        ),
+    )
+
+    await session.start(agent=CampusMitraAgent(), room=ctx.room)
+
+    await session.generate_reply(
+        user_input="Greet the user warmly as CampusMitra, the AI voice assistant for MVGR College of Engineering, and ask how you can help them today."
+    )
+
+
+if __name__ == "__main__":
+    agents.cli.run_app(server)

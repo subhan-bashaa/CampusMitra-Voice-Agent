@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusMitra — AI-Powered Voice Assistant for College Queries</title>
+  <meta name="description" content="CampusMitra is the AI voice assistant for MVGR College of Engineering. Instant spoken answers on admissions, courses, fees, hostels, exams, transport, and placements." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070d1e;
+      --bg-card: #0d1733;
+      --bg-card-hover: #132247;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-accent: rgba(59, 130, 246, 0.4);
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.35);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.4);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.3);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --user-bubble: #1e293b;
+      --bot-bubble: #172554;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top right, #111d40 0%, #070d1e 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(13, 23, 51, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 12px 24px;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #1d4ed8, #059669);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .logo-badge svg {
+      width: 24px;
+      height: 24px;
+      fill: #ffffff;
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .college-tag {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
+    }
+
+    /* Main Grid */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+    }
+
+    .chat-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: calc(100vh - 120px);
+    }
+
+    /* Voice Bar */
+    .voice-control-bar {
+      padding: 16px 20px;
+      background: rgba(10, 18, 40, 0.7);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .voice-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 12px var(--emerald-glow);
+    }
+
+    .status-dot.listening {
+      background: #ef4444;
+      box-shadow: 0 0 16px #ef4444;
+      animation: pulse 1.2s infinite;
+    }
+
+    .status-dot.speaking {
+      background: var(--gold);
+      box-shadow: 0 0 16px var(--gold);
+      animation: pulse 0.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+
+    .status-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .voice-soundwave {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 24px;
+    }
+
+    .soundwave-bar {
+      width: 3px;
+      background: var(--primary);
+      border-radius: 2px;
+      height: 6px;
+      transition: height 0.15s ease;
+    }
+
+    .soundwave-bar.active {
+      animation: wave 0.8s infinite ease-in-out;
+    }
+
+    .soundwave-bar:nth-child(1) { animation-delay: 0.0s; }
+    .soundwave-bar:nth-child(2) { animation-delay: 0.2s; }
+    .soundwave-bar:nth-child(3) { animation-delay: 0.4s; }
+    .soundwave-bar:nth-child(4) { animation-delay: 0.1s; }
+    .soundwave-bar:nth-child(5) { animation-delay: 0.3s; }
+
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 22px; background: var(--emerald); }
+    }
+
+    .voice-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-voice-toggle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--border-accent);
+      background: linear-gradient(135deg, #1e40af, #2563eb);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--primary-glow);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-voice-toggle:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+
+    .btn-voice-toggle svg,
+    .btn-icon svg {
+      pointer-events: none;
+    }
+
+    .btn-voice-toggle.recording {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      border-color: #fca5a5;
+      animation: mic-pulse 1.4s infinite;
+    }
+
+    @keyframes mic-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      color: var(--text-main);
+      border-color: var(--border-accent);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-icon.active {
+      color: var(--emerald);
+      border-color: var(--emerald);
+    }
+
+    /* Quick chips */
+    .quick-chips-wrapper {
+      padding: 12px 20px;
+      background: rgba(13, 23, 51, 0.5);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+      white-space: nowrap;
+      display: flex;
+      gap: 8px;
+      scrollbar-width: none;
+    }
+
+    .quick-chips-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chip-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-btn:hover {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: var(--primary);
+      color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    /* Message stream */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-behavior: smooth;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 12px;
+      max-width: 85%;
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .avatar.user-avatar {
+      background: #334155;
+      color: #f8fafc;
+    }
+
+    .avatar.bot-avatar {
+      background: linear-gradient(135deg, #2563eb, #10b981);
+      color: #ffffff;
+      box-shadow: 0 4px 10px var(--primary-glow);
+    }
+
+    .bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      position: relative;
+    }
+
+    .message-row.user .bubble {
+      background: var(--user-bubble);
+      color: #f1f5f9;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top-right-radius: 4px;
+    }
+
+    .message-row.bot .bubble {
+      background: var(--bot-bubble);
+      color: #f8fafc;
+      border: 1px solid var(--border-accent);
+      border-top-left-radius: 4px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .bubble-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .intent-badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+    }
+
+    .source-citation {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      border-left: 3px solid #3b82f6;
+      font-size: 0.76rem;
+      color: #94a3b8;
+    }
+
+    .source-citation summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #93c5fd;
+      outline: none;
+    }
+
+    .source-citation p {
+      margin-top: 6px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .clarification-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .clarification-chip {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fde68a;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clarification-chip:hover {
+      background: rgba(245, 158, 11, 0.25);
+      transform: translateY(-1px);
+    }
+
+    /* Input bar */
+    .input-form {
+      padding: 16px 20px;
+      background: rgba(10, 18, 40, 0.9);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .input-field {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: #f8fafc;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .btn-send {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-send:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .side-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .side-card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #e2e8f0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #60a5fa;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .office-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+
+    .office-item {
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      border-left: 3px solid #10b981;
+    }
+
+    .office-name {
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 2px;
+    }
+
+    .office-phone {
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #0f1c3f;
+      border: 1px solid var(--border-accent);
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      padding: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .modal-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      color: #f8fafc;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .doc-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .doc-title {
+      font-weight: 600;
+      color: #93c5fd;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+
+    .doc-desc {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-color);
+      background: #060b19;
+      padding: 16px 24px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-badge" id="app-logo">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 id="app-brand-title">
+            CampusMitra
+            <span class="college-tag">MVGR Autonomous</span>
+          </h1>
+          <p id="app-tagline">Your AI Companion for Everything Campus</p>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn-secondary" id="btn-open-kb" onclick="openModal('kb-modal')">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M19 2H5C3.9 2 3 2.9 3 4V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1 21 20V4C21 2.9 20.1 2 19 2M19 20H5V4H19V20M7 6H17V8H7V6M7 10H17V12H7V10M7 14H14V16H7V14Z"/></svg>
+          Knowledge Base (3 PDFs)
+        </button>
+        <button class="btn-secondary" id="btn-open-offices" onclick="openModal('office-modal')">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2M12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/></svg>
+          Campus Directory
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main>
+    <!-- Chat & Voice Panel -->
+    <section class="chat-panel" id="main-panel">
+      <!-- Voice Control Bar -->
+      <div class="voice-control-bar" id="voice-bar">
+        <div class="voice-status">
+          <div class="status-dot" id="voice-dot"></div>
+          <span class="status-text" id="voice-status-text">Voice System Ready</span>
+          <div class="voice-soundwave" id="soundwave">
+            <div class="soundwave-bar"></div>
+            <div class="soundwave-bar"></div>
+            <div class="soundwave-bar"></div>
+            <div class="soundwave-bar"></div>
+            <div class="soundwave-bar"></div>
+          </div>
+        </div>
+
+        <div class="voice-actions">
+          <button class="btn-icon active" id="btn-toggle-tts" title="Toggle Spoken Responses" onclick="toggleTTS()">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23M16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12M3 9V15H7L12 20V4L7 9H3Z"/></svg>
+          </button>
+          <button class="btn-voice-toggle" id="btn-mic" title="Speak to CampusMitra" onclick="toggleMic()">
+            <svg id="mic-icon" width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14M17.3 11C17.3 14 14.76 16.1 12 16.1C9.24 16.1 6.7 14 6.7 11H5C5 14.41 7.72 17.23 11 17.72V21H13V17.72C16.28 17.23 19 14.41 19 11H17.3Z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="quick-chips-wrapper" id="quick-chips">
+        <button class="chip-btn" onclick="sendQuickPrompt('How can I apply for admission?')">🎓 Admissions</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('What courses does MVGR offer?')">📚 Courses</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('What is the B.Tech fee?')">💰 Fees</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('Does MVGR have hostel?')">🏢 Hostel</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('What are the latest placement figures?')">💼 Placements</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('Does MVGR provide transport?')">🚌 Transport</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('Does MVGR have a library?')">📖 Library</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('Is lateral entry available?')">⚙️ Lateral Entry</button>
+      </div>
+
+      <!-- Messages Area -->
+      <div class="messages-container" id="messages-stream">
+        <!-- Initial Welcome Message -->
+        <div class="message-row bot">
+          <div class="avatar bot-avatar">CM</div>
+          <div class="bubble-wrapper">
+            <div class="bubble">
+              Hi! I'm <strong>CampusMitra</strong>, your AI voice assistant for <strong>MVGR College of Engineering</strong>. How can I help you today with admissions, courses, fees, exams, hostels, or placements?
+            </div>
+            <div class="bubble-meta">
+              <span class="intent-badge">GREETING</span>
+              <span>CampusMitra Assistant</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Form -->
+      <form class="input-form" id="chat-form" onsubmit="handleChatSubmit(event)">
+        <input
+          type="text"
+          class="input-field"
+          id="query-input"
+          placeholder="Ask about admissions, courses, fees, exams, hostel, transport, placements..."
+          autocomplete="off"
+        />
+        <button type="submit" class="btn-send" id="btn-send-text">
+          <span>Ask</span>
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- Sidebar Highlights -->
+    <aside class="sidebar">
+      <!-- Fast Stats Card -->
+      <div class="side-card">
+        <h2>
+          <svg width="20" height="20" fill="#3b82f6" viewBox="0 0 24 24"><path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z"/></svg>
+          MVGR At a Glance
+        </h2>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val">60</div>
+            <div class="stat-label">Acre Campus</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">300</div>
+            <div class="stat-label">CSE Seats 2026</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">764</div>
+            <div class="stat-label">2026 Job Offers</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">₹76,900</div>
+            <div class="stat-label">B.Tech Tuition</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Official Contacts Card -->
+      <div class="side-card">
+        <h2>
+          <svg width="20" height="20" fill="#10b981" viewBox="0 0 24 24"><path d="M20 15.5C18.8 15.5 17.5 15.3 16.4 14.9C16.1 14.8 15.7 14.9 15.5 15.1L13.2 17.4C10.4 15.9 8.1 13.6 6.6 10.8L8.9 8.5C9.1 8.3 9.2 7.9 9.1 7.6C8.7 6.5 8.5 5.2 8.5 4C8.5 3.4 8.1 3 7.5 3H4C3.4 3 3 3.4 3 4C3 13.4 10.6 21 20 21C20.6 21 21 20.6 21 20V16.5C21 15.9 20.6 15.5 20 15.5Z"/></svg>
+          College Helplines
+        </h2>
+        <div class="office-list">
+          <div class="office-item">
+            <div class="office-name">Admission Office (10 AM - 4 PM)</div>
+            <div class="office-phone">📞 08922-241749 / 9704950954</div>
+          </div>
+          <div class="office-item">
+            <div class="office-name">Campus General Enquiry</div>
+            <div class="office-phone">📞 08922-241732 / 241039</div>
+          </div>
+          <div class="office-item">
+            <div class="office-name">Email Support</div>
+            <div class="office-phone">✉️ helpdesk@mvgrce.edu.in</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Autonomous Tag Card -->
+      <div class="side-card">
+        <h2 style="font-size:0.95rem;">Accreditation & Approvals</h2>
+        <p style="font-size:0.8rem; color:#94a3b8; line-height:1.5;">
+          Permanent Affiliation to <strong>JNTUGV</strong>. Approved by <strong>AICTE</strong>. Accredited by <strong>NAAC & NBA</strong>. Autonomous institution following Choice Based Credit System (CBCS).
+        </p>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Knowledge Base Modal -->
+  <div class="modal-overlay" id="kb-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Official MVGR Knowledge Base</h3>
+        <button class="modal-close" onclick="closeModal('kb-modal')">&times;</button>
+      </div>
+      <p style="font-size:0.84rem; color:#94a3b8; margin-bottom:16px;">
+        CampusMitra is strictly grounded in these three official MVGR documents. It will never hallucinate or invent college figures:
+      </p>
+
+      <div class="doc-card">
+        <div class="doc-title">1. Admissions, Fees & Student Enquiries (Sept 2026)</div>
+        <div class="doc-desc">Covers 2026 intake (CSE: 300, CSE AI&ML: 240, etc.), 70% Convener (EAPCET) & 30% Management quota, AFRC fee schedule (₹76,900 B.Tech), and Admission office helplines.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-title">2. Campus, Hostel, Library, Medical & Transport</div>
+        <div class="doc-desc">Details the 60-acre campus, 83 laboratories, 48,000 sq ft library (KOHA, RFID, DELNET), boys and Maharani Vidyavathi Devi girls hostels, medical officer, and college bus routes.</div>
+      </div>
+
+      <div class="doc-card">
+        <div class="doc-title">3. Courses, Academics, Departments & Placements</div>
+        <div class="doc-desc">Specifies autonomous CBCS curriculum, batch-specific exam calendar requirements, and official placement statistics (2026 highlight: 764 offers from 122 companies; 2025 report: 810 offers).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Office Directory Modal -->
+  <div class="modal-overlay" id="office-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>MVGR College Office Directory</h3>
+        <button class="modal-close" onclick="closeModal('office-modal')">&times;</button>
+      </div>
+      <div class="office-list" style="gap:14px;">
+        <div class="office-item">
+          <div class="office-name">Admission Office</div>
+          <div class="office-phone">Landline: 08922-241749 | Mobile: 9704950954, 9441663201 | Email: helpdesk@mvgrce.edu.in</div>
+          <div style="font-size:0.75rem; color:#60a5fa; margin-top:2px;">Hours: 10:00 AM – 4:00 PM</div>
+        </div>
+        <div class="office-item">
+          <div class="office-name">Accounts & Fee Section</div>
+          <div class="office-phone">Phone: 08922-241732 / 241039 | In-person: Admin Block</div>
+        </div>
+        <div class="office-item">
+          <div class="office-name">Examination Cell</div>
+          <div class="office-phone">Phone: 08922-241732 | Publishes batch notifications & semester exam schedules</div>
+        </div>
+        <div class="office-item">
+          <div class="office-name">Training & Placement (T&P) Cell</div>
+          <div class="office-phone">Phone: 08922-241732 | Facilitates campus recruitment and employability training</div>
+        </div>
+        <div class="office-item">
+          <div class="office-name">Hostel Office & Wardens</div>
+          <div class="office-phone">Phone: 08922-241732 | Boys Hostels & Maharani Vidyavathi Devi Girls Hostel</div>
+        </div>
+        <div class="office-item">
+          <div class="office-name">Transport Office</div>
+          <div class="office-phone">Phone: 08922-241732 | Covering Vizag, Vizianagaram, Srikakulam, Bobbili, Saluru, L.Kota, Cheepurupalli</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    CampusMitra — AI-Powered Voice Assistant for MVGR College of Engineering (Autonomous), Vizianagaram. Affiliated to JNTUGV, Approved by AICTE, Accredited NAAC & NBA.
+  </footer>
+
+  <!-- Web Logic Script -->
+  <script>
+    let isListening = false;
+    let isProcessing = false;
+    let ttsEnabled = true;
+    let recognition = null;
+    const synth = window.speechSynthesis;
+
+    // Speech accumulation & turn tracking
+    let accumulatedFinalTranscript = '';
+    let latestInterimTranscript = '';
+    let silenceTimer = null;
+    let turnSubmitted = false;
+
+    // Deduplication tracking
+    const processedRequestIds = new Set();
+    let lastProcessedMessage = { text: '', time: 0, id: '' };
+    let lastSpeechResults = null;
+
+    // College Domain STT Normalizer: resolves acoustic misclassifications of MVGR college terms
+    function normalizeSTTTranscript(rawText) {
+      if (!rawText) return '';
+      let text = rawText;
+
+      // 1. Remove rogue acoustic artifacts like 'indonesia'
+      text = text.replace(/\b(in\s+)?indonesia\b/gi, '').trim();
+
+      // 2. Normalize 'free structure' -> 'fee structure' and related fee terms
+      text = text.replace(/\bfree\s+structure\b/gi, 'fee structure');
+      text = text.replace(/\bwhat\s+is\s+the\s+free\b/gi, 'what is the fee');
+      text = text.replace(/\bthe\s+free\s+of\b/gi, 'the fee of');
+      text = text.replace(/\bfree\s+(details|schedule|tuition|hostel|transport)\b/gi, 'fee $1');
+      text = text.replace(/\b(the\s+)?free\s+of\s+mvgr\b/gi, 'fee of MVGR');
+
+      // 3. Normalize MVGR variants: 'engager', 'the engager', 'manager college', 'm v g r', 'm.v.g.r.', 'mbgr'
+      text = text.replace(/\b(the\s+)?(engager|en\s*gager)\s*(college)?\b/gi, (match, p1, p2, p3) => {
+        return p3 ? 'MVGR College' : 'MVGR';
+      });
+      text = text.replace(/\b(manager|passenger|messenger)\s+college\b/gi, 'MVGR College');
+      text = text.replace(/\bm[\s\.]*v[\s\.]*[gj][\s\.]*r[\s\.]*(college)?\b/gi, (match, p1) => {
+        return p1 ? 'MVGR College' : 'MVGR';
+      });
+      text = text.replace(/\bmbgr\b/gi, 'MVGR');
+
+      // 4. Normalize department acronyms
+      text = text.replace(/\b(c[\s\.]*s[\s\.]*e)\.?(?=\s|$|[,\?!])/gi, 'CSE');
+      text = text.replace(/\b(e[\s\.]*c[\s\.]*e)\.?(?=\s|$|[,\?!])/gi, 'ECE');
+      text = text.replace(/\b(e[\s\.]*e[\s\.]*e)\.?(?=\s|$|[,\?!])/gi, 'EEE');
+      text = text.replace(/\b(i[\s\.]*o[\s\.]*t)\.?(?=\s|$|[,\?!])/gi, 'IoT');
+      text = text.replace(/\bai[\s\.]*(&|and)?[\s\.]*ml\b/gi, 'AI & ML');
+
+      // 5. Clean spacing and proper noun capitalization
+      text = text.replace(/\s{2,}/g, ' ').trim();
+      text = text.replace(/\bmvgr\s+college\b/gi, 'MVGR College');
+      text = text.replace(/\bmvgr\b/g, 'MVGR');
+
+      return text;
+    }
+
+    // Audio stream constraint optimizer for clear conversational speech
+    async function initOptimalAudio() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              channelCount: 1,
+              sampleRate: 48000
+            }
+          });
+          // Immediately stop test tracks so the microphone device is freely available for Web Speech API
+          stream.getTracks().forEach(track => track.stop());
+        } catch (e) {
+          console.warn('[AUDIO] Microphone constraints check:', e);
+        }
+      }
+    }
+
+    // Check Speech Recognition support and apply MVGR Vocabulary Grammar Boosting
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-IN'; // Configured specifically for Indian English context
+
+      // Inject JSGF Custom Vocabulary and Phrase Hints if supported by the browser engine
+      if (SpeechGrammarList) {
+        try {
+          const speechRecognitionList = new SpeechGrammarList();
+          const collegeGrammar = '#JSGF V1.0; grammar college_vocabulary; public <college_phrases> = ' +
+            'MVGR | "MVGR College" | "MVGR College of Engineering" | Vizianagaram | ' +
+            'fee | "fee structure" | "tuition fee" | "hostel fee" | "transport fee" | ' +
+            'admissions | "admission process" | quota | convener | ' +
+            'CSE | "Computer Science" | "AI & ML" | "Artificial Intelligence" | "Data Science" | IoT | "Cyber Security" | ' +
+            'ECE | EEE | Mechanical | Civil | Chemical | ' +
+            'courses | departments | hostel | placements | internships | scholarships | transport | library | examinations | "academic calendar" ;';
+          speechRecognitionList.addFromString(collegeGrammar, 1.0);
+          recognition.grammars = speechRecognitionList;
+        } catch (e) {
+          console.warn('[STT] SpeechGrammarList setup note:', e);
+        }
+      }
+
+      recognition.onstart = () => {
+        isListening = true;
+        turnSubmitted = false;
+        accumulatedFinalTranscript = '';
+        latestInterimTranscript = '';
+        lastSpeechResults = null;
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          silenceTimer = null;
+        }
+        console.log('[VOICE] recognition started');
+        updateVoiceUI('listening', 'Listening to you...');
+      };
+
+      recognition.onresult = (event) => {
+        if (turnSubmitted) return;
+
+        // Reset silence timer on any incoming speech
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          silenceTimer = null;
+        }
+
+        lastSpeechResults = event.results;
+
+        // Reconstruct the complete transcript of the session from all results (0 to length - 1)
+        let finalStr = '';
+        let interimStr = '';
+
+        for (let i = 0; i < event.results.length; ++i) {
+          const res = event.results[i];
+          const text = res[0].transcript;
+          if (res.isFinal) {
+            finalStr += text + ' ';
+          } else {
+            interimStr += text;
+          }
+        }
+
+        accumulatedFinalTranscript = finalStr.trim();
+        latestInterimTranscript = interimStr.trim();
+
+        const lastChunk = event.results[event.results.length - 1];
+        const rawText = lastChunk ? lastChunk[0].transcript.trim() : '';
+        console.log('[VOICE] raw STT result:', rawText);
+
+        if (latestInterimTranscript) {
+          console.log('[VOICE] interim transcript:', latestInterimTranscript);
+        }
+        if (accumulatedFinalTranscript) {
+          console.log('[VOICE] final transcript:', accumulatedFinalTranscript);
+        }
+
+        // Combine finalized text and current interim text for live preview and complete sentence tracking
+        const currentComplete = (accumulatedFinalTranscript + (latestInterimTranscript ? (accumulatedFinalTranscript ? ' ' : '') + latestInterimTranscript : '')).trim();
+
+        // Update live preview in UI only (NEVER creates a permanent chat bubble)
+        if (currentComplete) {
+          const previewClean = normalizeSTTTranscript(currentComplete);
+          updateVoiceUI('listening', 'Listening: "' + previewClean + '"');
+        }
+
+        // Natural pause detection: wait 2.0s of silence after speech before submitting
+        // This accommodates natural conversational pauses between words/phrases without premature cut-off
+        if (currentComplete) {
+          silenceTimer = setTimeout(() => {
+            finalizeAndSubmitSpeechTurn();
+          }, 2000);
+        }
+      };
+
+      recognition.onspeechend = () => {
+        // Speech paused notification from browser VAD.
+        // Do NOT submit prematurely here — the 2.0s silenceTimer handles natural pauses.
+      };
+
+      recognition.onerror = (event) => {
+        console.warn('[VOICE] Speech error:', event.error);
+        if (event.error === 'no-speech') {
+          if (!accumulatedFinalTranscript && !latestInterimTranscript) {
+            isListening = false;
+            updateVoiceUI('idle', 'Voice System Ready');
+            return;
+          }
+        } else if (event.error === 'not-allowed') {
+          isListening = false;
+          updateVoiceUI('idle', 'Microphone blocked — Please allow mic in browser');
+          alert('Microphone access was denied. Please click the lock/settings icon in your browser address bar and allow microphone permissions for http://localhost:8000.');
+          return;
+        } else if (event.error === 'audio-capture') {
+          isListening = false;
+          updateVoiceUI('idle', 'Microphone not found or in use');
+          return;
+        } else if (event.error === 'network') {
+          isListening = false;
+          updateVoiceUI('idle', 'Voice network error');
+          return;
+        } else {
+          isListening = false;
+          updateVoiceUI('idle', 'Voice System Ready');
+        }
+      };
+
+      recognition.onend = () => {
+        if (turnSubmitted) {
+          isListening = false;
+          if (!document.getElementById('voice-dot')?.classList.contains('speaking')) {
+            updateVoiceUI('idle', 'Voice System Ready');
+          }
+          return;
+        }
+
+        // If the user is still in a voice turn and silenceTimer is active,
+        // Chrome may have closed its stream on a pause. Restart to continue capturing!
+        if (isListening && silenceTimer) {
+          try {
+            recognition.start();
+          } catch (e) {}
+          return;
+        }
+
+        if (accumulatedFinalTranscript || latestInterimTranscript) {
+          finalizeAndSubmitSpeechTurn();
+        } else {
+          isListening = false;
+          updateVoiceUI('idle', 'Voice System Ready');
+        }
+      };
+    }
+
+    // Finalize speech turn, stopping recognition and submitting the complete utterance ONCE
+    function finalizeAndSubmitSpeechTurn() {
+      if (turnSubmitted) return;
+      if (silenceTimer) {
+        clearTimeout(silenceTimer);
+        silenceTimer = null;
+      }
+
+      // Reconstruct the full sentence from accumulated final transcript and any trailing interim text
+      let completeSentence = accumulatedFinalTranscript.trim();
+      if (latestInterimTranscript.trim()) {
+        const trailing = latestInterimTranscript.trim();
+        if (!completeSentence.endsWith(trailing)) {
+          completeSentence = (completeSentence ? completeSentence + ' ' : '') + trailing;
+        }
+      }
+
+      if (!completeSentence) {
+        turnSubmitted = true;
+        isListening = false;
+        try { recognition.stop(); } catch (e) {}
+        updateVoiceUI('idle', 'Voice System Ready');
+        return;
+      }
+
+      turnSubmitted = true;
+      isListening = false;
+
+      // Extract confidence from recognition results
+      let totalConfidence = 0;
+      let count = 0;
+      if (lastSpeechResults) {
+        for (let i = 0; i < lastSpeechResults.length; ++i) {
+          if (lastSpeechResults[i][0] && typeof lastSpeechResults[i][0].confidence === 'number' && lastSpeechResults[i][0].confidence > 0) {
+            totalConfidence += lastSpeechResults[i][0].confidence;
+            count++;
+          }
+        }
+      }
+      const avgConfidence = count > 0 ? (totalConfidence / count) : 0.94;
+
+      // Apply College Domain STT Normalization
+      const normalizedSentence = normalizeSTTTranscript(completeSentence);
+
+      // Section 11 Required STT Boundary Debug Logs
+      console.log('[STT] raw transcript:', completeSentence);
+      console.log('[STT] final transcript:', accumulatedFinalTranscript || completeSentence);
+      console.log('[STT] detected language:', (recognition && recognition.lang) ? recognition.lang : 'en-IN');
+      console.log('[STT] confidence:', (avgConfidence * 100).toFixed(1) + '%');
+      console.log('[STT] normalized transcript:', normalizedSentence);
+      console.log('[VOICE] submitting transcript:', normalizedSentence);
+
+      console.log('[VOICE] utterance complete:', normalizedSentence);
+      console.log('[VOICE] submitting:', normalizedSentence);
+
+      try {
+        recognition.stop();
+      } catch (e) {}
+
+      updateVoiceUI('speaking', 'CampusMitra Thinking...');
+      const input = document.getElementById('query-input');
+      if (input) input.value = '';
+
+      processUserMessage(normalizedSentence, 'voice');
+    }
+
+    async function toggleMic() {
+      if (!recognition) {
+        alert('Web Speech recognition is not supported in this browser. Please open http://localhost:8000 in Google Chrome or Microsoft Edge.');
+        return;
+      }
+      if (isListening) {
+        // User explicitly tapped the mic button to finish speaking and submit immediately
+        isListening = false;
+        if (!turnSubmitted && (accumulatedFinalTranscript || latestInterimTranscript)) {
+          finalizeAndSubmitSpeechTurn();
+        } else {
+          turnSubmitted = true;
+          if (silenceTimer) {
+            clearTimeout(silenceTimer);
+            silenceTimer = null;
+          }
+          try { recognition.stop(); } catch (e) {}
+          updateVoiceUI('idle', 'Voice System Ready');
+        }
+      } else {
+        if (isProcessing) {
+          console.warn('[VOICE] Cannot start listening while a response is being generated.');
+          return;
+        }
+        if (synth) synth.cancel();
+
+        // Immediate visual feedback on click
+        updateVoiceUI('listening', 'Connecting microphone...');
+
+        // Verify audio permissions with clean constraints
+        await initOptimalAudio();
+
+        // Clean utterance state completely for the new turn
+        turnSubmitted = false;
+        accumulatedFinalTranscript = '';
+        latestInterimTranscript = '';
+        lastSpeechResults = null;
+        if (silenceTimer) {
+          clearTimeout(silenceTimer);
+          silenceTimer = null;
+        }
+        try {
+          recognition.start();
+        } catch (e) {
+          console.warn('Could not start recognition:', e);
+          // If already started or pending, handle gracefully
+          if (e.name === 'InvalidStateError') {
+            try { recognition.stop(); } catch (err) {}
+            setTimeout(() => {
+              try { recognition.start(); } catch (err) {}
+            }, 200);
+          } else {
+            isListening = false;
+            updateVoiceUI('idle', 'Voice System Ready');
+          }
+        }
+      }
+    }
+
+    function toggleTTS() {
+      ttsEnabled = !ttsEnabled;
+      const btn = document.getElementById('btn-toggle-tts');
+      if (ttsEnabled) {
+        btn.classList.add('active');
+        btn.title = "Spoken responses enabled";
+      } else {
+        btn.classList.remove('active');
+        btn.title = "Spoken responses muted";
+        if (synth) synth.cancel();
+      }
+    }
+
+    function speakText(text) {
+      if (!ttsEnabled || !synth) return;
+      synth.cancel();
+
+      // Clean spoken text: remove markdown symbols
+      const clean = text.replace(/[*#_`]/g, '').trim();
+      const utterance = new SpeechSynthesisUtterance(clean);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.lang = 'en-IN';
+
+      utterance.onstart = () => {
+        updateVoiceUI('speaking', 'CampusMitra Speaking...');
+      };
+
+      utterance.onend = () => {
+        updateVoiceUI('idle', 'Voice System Ready');
+      };
+
+      utterance.onerror = () => {
+        updateVoiceUI('idle', 'Voice System Ready');
+      };
+
+      synth.speak(utterance);
+    }
+
+    function updateVoiceUI(state, text) {
+      const dot = document.getElementById('voice-dot');
+      const micBtn = document.getElementById('btn-mic');
+      const statusText = document.getElementById('voice-status-text');
+      const soundwaveBars = document.querySelectorAll('.soundwave-bar');
+
+      if (!dot || !micBtn || !statusText) return;
+
+      dot.className = 'status-dot';
+      statusText.innerText = text;
+
+      if (state === 'listening') {
+        dot.classList.add('listening');
+        micBtn.classList.add('recording');
+        soundwaveBars.forEach(b => b.classList.add('active'));
+      } else if (state === 'speaking') {
+        dot.classList.add('speaking');
+        micBtn.classList.remove('recording');
+        soundwaveBars.forEach(b => b.classList.add('active'));
+      } else {
+        micBtn.classList.remove('recording');
+        soundwaveBars.forEach(b => b.classList.remove('active'));
+      }
+    }
+
+    function handleChatSubmit(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const input = document.getElementById('query-input');
+      const query = input ? input.value.trim() : '';
+      if (!query) return;
+      if (isProcessing) {
+        console.warn('[MESSAGE] Submission blocked: another request is in-flight');
+        return;
+      }
+      input.value = '';
+      processUserMessage(query, 'typed');
+    }
+
+    function sendQuickPrompt(prompt) {
+      if (isProcessing) {
+        console.warn('[MESSAGE] Quick prompt blocked: another request is in-flight');
+        return;
+      }
+      processUserMessage(prompt, 'quick_chip');
+    }
+
+    // Unified message processing with comprehensive deduplication
+    async function processUserMessage(rawQuery, source = 'text') {
+      const query = (rawQuery || '').trim();
+      if (!query) return;
+
+      const now = Date.now();
+      const normalized = query.toLowerCase();
+
+      // 1. Guard against concurrent in-flight submissions
+      if (isProcessing) {
+        console.warn('[MESSAGE] Duplicate prevented: request already in progress for:', query);
+        return;
+      }
+
+      // 2. Guard against duplicate identical transcript/text arriving within 2.5 seconds
+      if (lastProcessedMessage.text.toLowerCase() === normalized && (now - lastProcessedMessage.time) < 2500) {
+        console.warn('[MESSAGE] Duplicate prevented: identical message submitted within 2.5s window:', query);
+        return;
+      }
+
+      // 3. Generate unique request ID
+      const requestId = 'cm_' + now + '_' + Math.random().toString(36).substring(2, 9);
+      if (processedRequestIds.has(requestId)) {
+        console.warn('[MESSAGE] Duplicate prevented: request ID already processed:', requestId);
+        return;
+      }
+
+      // Mark processing state and record message
+      isProcessing = true;
+      lastProcessedMessage = { text: query, time: now, id: requestId };
+      processedRequestIds.add(requestId);
+
+      const sendBtn = document.getElementById('btn-send-text');
+      const input = document.getElementById('query-input');
+      if (sendBtn) sendBtn.disabled = true;
+      if (input) input.value = '';
+
+      console.log('[MESSAGE] submitting user message', query, '(source:', source, 'id:', requestId, ')');
+      appendUserMessage(query, requestId);
+      updateVoiceUI('speaking', 'CampusMitra Thinking...');
+
+      try {
+        if (source === 'voice') {
+          console.log('[VOICE] API request:', query);
+          console.log('[VOICE] API request started', query, 'requestId:', requestId);
+        }
+        console.log('[API] request started', query, 'requestId:', requestId);
+
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query, request_id: requestId })
+        });
+        const data = await res.json();
+
+        if (source === 'voice') {
+          console.log('[VOICE] API response received', data);
+        }
+        console.log('[API] response received', data);
+
+        appendBotMessage(data.answer, data.intent, data.sources, data.is_clarification, query, requestId);
+        console.log('[MESSAGE] assistant response added');
+        speakText(data.answer);
+      } catch (err) {
+        console.error('[API] request failed', err);
+        appendBotMessage("I had trouble reaching the college server. Please try again or visit helpdesk@mvgrce.edu.in.", "ERROR", [], false, query, requestId);
+        console.log('[MESSAGE] assistant response added');
+        updateVoiceUI('idle', 'Voice System Ready');
+      } finally {
+        isProcessing = false;
+        if (sendBtn) sendBtn.disabled = false;
+      }
+    }
+
+    // Keep handleQuery for backwards-compatibility, routing directly through processUserMessage
+    function handleQuery(query) {
+      processUserMessage(query, 'direct');
+    }
+
+    function appendUserMessage(text, messageId) {
+      const container = document.getElementById('messages-stream');
+      if (!container) return;
+
+      // Duplicate element protection in DOM
+      if (messageId && container.querySelector(`[data-msg-id="${messageId}"]`)) {
+        console.warn('[DOM] User message already rendered for ID:', messageId);
+        return;
+      }
+
+      const div = document.createElement('div');
+      div.className = 'message-row user';
+      if (messageId) div.setAttribute('data-msg-id', messageId);
+      div.innerHTML = `
+        <div class="avatar user-avatar">You</div>
+        <div class="bubble-wrapper">
+          <div class="bubble">${escapeHtml(text)}</div>
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function appendBotMessage(answer, intent, sources, isClarification, originalQuery, responseId) {
+      const container = document.getElementById('messages-stream');
+      if (!container) return;
+
+      // Duplicate element protection in DOM
+      if (responseId && container.querySelector(`[data-bot-id="${responseId}"]`)) {
+        console.warn('[DOM] Bot response already rendered for ID:', responseId);
+        return;
+      }
+
+      const div = document.createElement('div');
+      div.className = 'message-row bot';
+      if (responseId) div.setAttribute('data-bot-id', responseId);
+
+      let citationHtml = '';
+      if (sources && sources.length > 0) {
+        citationHtml = `
+          <details class="source-citation">
+            <summary>📄 Verified Source Context (${sources.length})</summary>
+            <p>${escapeHtml(sources.join('\n\n'))}</p>
+          </details>
+        `;
+      }
+
+      let clarificationChips = '';
+      if (isClarification) {
+        if (originalQuery.toLowerCase().includes('fee')) {
+          clarificationChips = `
+            <div class="clarification-chips">
+              <span class="clarification-chip" onclick="processUserMessage('What is the B.Tech tuition fee?', 'clarification')">Tuition Fee</span>
+              <span class="clarification-chip" onclick="processUserMessage('What is the hostel fee?', 'clarification')">Hostel Fee</span>
+              <span class="clarification-chip" onclick="processUserMessage('What is the transport fee?', 'clarification')">Transport Fee</span>
+            </div>
+          `;
+        } else if (originalQuery.toLowerCase().includes('cse')) {
+          clarificationChips = `
+            <div class="clarification-chips">
+              <span class="clarification-chip" onclick="processUserMessage('What is the CSE intake?', 'clarification')">CSE Intake</span>
+              <span class="clarification-chip" onclick="processUserMessage('What is the CSE admission process?', 'clarification')">CSE Admission</span>
+              <span class="clarification-chip" onclick="processUserMessage('Does MVGR offer AI and ML in CSE?', 'clarification')">AI & ML</span>
+            </div>
+          `;
+        }
+      }
+
+      div.innerHTML = `
+        <div class="avatar bot-avatar">CM</div>
+        <div class="bubble-wrapper">
+          <div class="bubble">
+            ${escapeHtml(answer)}
+            ${clarificationChips}
+            ${citationHtml}
+          </div>
+          <div class="bubble-meta">
+            <span class="intent-badge">${escapeHtml(intent || 'COLLEGE_QUERY')}</span>
+            <span>CampusMitra Voice</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    window.onclick = function(e) {
+      if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('open');
+      }
+    };
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Direct event listener bindings
+    window.toggleMic = toggleMic;
+    window.toggleTTS = toggleTTS;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.handleChatSubmit = handleChatSubmit;
+    window.sendQuickPrompt = sendQuickPrompt;
+    window.processUserMessage = processUserMessage;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const micBtn = document.getElementById('btn-mic');
+      if (micBtn) {
+        micBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleMic();
+        });
+      }
+      const ttsBtn = document.getElementById('btn-toggle-tts');
+      if (ttsBtn) {
+        ttsBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleTTS();
+        });
+      }
+      console.log('[CampusMitra] UI & Voice Handlers Initialized Successfully');
+    });
+  </script>
+</body>
+</html>

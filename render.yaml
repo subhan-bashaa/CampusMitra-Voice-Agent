@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: campusmitra-voice-agent
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python ingest.py
+    startCommand: python web_server.py
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.12.4

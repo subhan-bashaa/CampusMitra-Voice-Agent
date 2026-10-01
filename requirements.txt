@@ -1,0 +1,21 @@
+# LangChain & LLM
+langchain
+langchain-groq
+langchain-community
+
+# Embeddings & Vector DB
+sentence-transformers
+qdrant-client
+
+# Document processing
+pypdf>=6.0
+
+# Settings & Environment
+python-dotenv
+pydantic-settings
+
+# Optional Voice / LiveKit plugins (for LiveKit agent)
+livekit-agents>=1.0
+livekit-plugins-deepgram
+livekit-plugins-inworld
+livekit-plugins-langchain
